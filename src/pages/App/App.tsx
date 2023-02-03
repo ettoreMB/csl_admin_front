@@ -9,12 +9,16 @@ import { AppContainer } from './styles'
 import Routes from '../../routes'
 import { Header } from '../../components/Header'
 import ToastContainer from '../../components/Toast/ToastContainer'
-
+import { IPublicClientApplication } from '@azure/msal-browser'
 import { MsalProvider } from '@azure/msal-react'
 
-export default function App ({ msalInstance }: any) {
+interface AppProps {
+  pca: IPublicClientApplication
+}
+
+export default function App ({ pca }: AppProps) {
   return (
-    <MsalProvider instance={msalInstance}>
+    <MsalProvider instance={pca}>
       <BrowserRouter>
         <ThemeProvider theme={defaultTheme }>
           <GlobalStyles />
