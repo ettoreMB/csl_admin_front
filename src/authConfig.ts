@@ -1,16 +1,13 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { Configuration, PopupRequest, LogLevel } from '@azure/msal-browser'
-
-/**
- * Configuration object to be passed to MSAL instance on creation.
- * For a full list of MSAL.js configuration parameters, visit:
- * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-browser/docs/configuration.md
- */
+const clientId = String(process.env.REACT_APP_CLIENT_ID)
+const authorityLink = process.env.REACT_APP_AUTH_LINK
 export const msalConfig: Configuration = {
   auth: {
-    clientId: '595770f6-6214-4ba3-bbfd-0018c535b9c8', // This is the ONLY mandatory field that you need to supply.
-    authority: 'https://login.microsoftonline.com/759021f9-a104-4f0d-87c8-465b3f9c204f', // Defaults to "https://login.microsoftonline.com/common"
-    redirectUri: 'https://csl-admin-front.vercel.app/', // Points to window.location.origin. You must register this URI on Azure Portal/App Registration.
-    postLogoutRedirectUri: 'https://csl-admin-front.vercel.app/login', // Indicates the page to navigate after logout.
+    clientId,
+    authority: authorityLink,
+    redirectUri: '/',
+    postLogoutRedirectUri: 'https://csl-admin-front.vercel.app/login',
     navigateToLoginRequestUrl: false // If "true", will navigate back to the original request location before processing the auth code response.
   },
   cache: {
@@ -42,7 +39,7 @@ export const msalConfig: Configuration = {
 }
 
 export const loginRequest: PopupRequest = {
-  scopes: []
+  scopes: ['User.Read']
 }
 
 /**

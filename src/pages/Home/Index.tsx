@@ -6,7 +6,6 @@ import Modal from '../../components/Modal'
 import CreateEstabelecimento from '../NewEstabelecimento'
 import { Container, InputSearchContainer } from './styles'
 import enterIcon from '../../assets/icons/enter.svg'
-
 import Loader from '../../components/Loader'
 
 interface EstabelecimentoProps {
@@ -52,7 +51,7 @@ export default function Home () {
     async function getData () {
       try {
         setIsLoading(true)
-        const response = await axios.get(`${process.env.REACT_APP_BASE_BACK_URL}/estabelecimentos`)
+        const response = await axios.get(`${process.env.REACT_APP_URL}/estabelecimentos`)
 
         setEstabelecimentos(response.data)
         setHasError(false)
@@ -69,7 +68,8 @@ export default function Home () {
   const isListEmpty = !hasError && (!isLoading && !hasEstabelecimentos)
   return (
     <>
-      <Container>
+
+         <Container>
         <Loader isLoading={isLoading} />
         {hasError && (<h1>Erro ao carregar a pagina</h1>)}
 

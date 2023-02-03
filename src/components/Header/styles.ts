@@ -21,6 +21,15 @@ export const HeaderContainer = styled.header`
   }
   img {
     height: 50px;
-
   }
+  div {
+    a {
+    text-decoration: none;
+    color: ${({ theme }) => theme.colors.gray[50]};
+    font-weight: bold;
+  }
+  }
+
+
+
 `
