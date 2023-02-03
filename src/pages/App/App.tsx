@@ -3,17 +3,18 @@ import {
   BrowserRouter
 } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
-
 import { defaultTheme } from '../../@types/styles/themes/deafult'
 import GlobalStyles from '../../@types/styles/global'
 import { AppContainer } from './styles'
-// import { Header } from '../../components/Header'
 import Routes from '../../routes'
 import { Header } from '../../components/Header'
 import ToastContainer from '../../components/Toast/ToastContainer'
 
-export default function App () {
+import { MsalProvider } from '@azure/msal-react'
+
+export default function App ({ msalInstance }: any) {
   return (
+    <MsalProvider instance={msalInstance}>
       <BrowserRouter>
         <ThemeProvider theme={defaultTheme }>
           <GlobalStyles />
@@ -25,5 +26,6 @@ export default function App () {
           </AppContainer>
         </ThemeProvider>
       </BrowserRouter>
+      </MsalProvider>
   )
 }
