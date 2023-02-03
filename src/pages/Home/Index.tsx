@@ -42,49 +42,47 @@ export default function Home () {
     return transforedCNPJ.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
   }
 
-  const filteredContactsByCNPJ = useMemo(() => estabelecimentos?.filter((estabelecimento: EstabelecimentoProps) => (
-    String(estabelecimento.CNPJ)
-      .startsWith(searchTerm.replace(/[^a-zA-Z0-9 ]/g, '')))
-  ), [estabelecimentos, searchTerm])
-
   useEffect(() => {
     async function getData () {
       try {
         setIsLoading(true)
-        const response = await axios.get(`${process.env.REACT_APP_URL}/estabelecimentos`)
+        const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos`)
 
         setEstabelecimentos(response.data)
         setHasError(false)
         setIsLoading(false)
       } catch (error) {
-        setIsLoading(false)
         setHasError(true)
+        setIsLoading(false)
       }
     }
 
     getData()
   }, [])
+  const filteredContactsByCNPJ = useMemo(() => estabelecimentos.filter((estabelecimento: EstabelecimentoProps) => (
+    String(estabelecimento.CNPJ)
+      .startsWith(searchTerm.replace(/[^a-zA-Z0-9 ]/g, '')))
+  ), [estabelecimentos, searchTerm])
   const hasEstabelecimentos = filteredContactsByCNPJ.length > 0
   const isListEmpty = !hasError && (!isLoading && !hasEstabelecimentos)
   return (
     <>
-
-         <Container>
         <Loader isLoading={isLoading} />
         {hasError && (<h1>Erro ao carregar a pagina</h1>)}
+         <Container>
 
         {hasEstabelecimentos && (
           <>
-            {isListEmpty && (<h1>Nenhum Cnpj encontrado</h1>)}
             <InputSearchContainer>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={handleSearchTerm}
                 placeholder="Pesquise pelo CNPJ"
-              />
+                />
 
             </InputSearchContainer>
+                {isListEmpty && (<h1>Nenhum Cnpj encontrado</h1>)}
             <table>
               <thead>
                 <tr>
