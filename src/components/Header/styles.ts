@@ -1,19 +1,26 @@
 import styled from 'styled-components'
 
 export const HeaderContainer = styled.header`
-  margin-top:64px;
-  display: flex;
+  height: 56px;
+  display: flex ;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
   margin-bottom: 48px;
-  nav {
+  background: ${({ theme }) => theme.colors.primary.main};
+  div {
     display: flex;
-    gap: 2rem;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 1280px;
+    padding: 0 16px;
 
-    a{
-      text-decoration: none;
-      font-weight: bold;
-      color: ${({ theme }) => theme.colors.gray['900']};
-    }
+  }
+  button {
+    background: transparent;
+    border:  none;
+  }
+  img {
+    height: 50px;
+
   }
 `

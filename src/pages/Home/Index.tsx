@@ -1,18 +1,31 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import axios from 'axios'
-import { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { useEffect, ChangeEvent, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Modal from '../../components/Modal'
 import CreateEstabelecimento from '../NewEstabelecimento'
 import { Container, InputSearchContainer } from './styles'
+import enterIcon from '../../assets/icons/enter.svg'
+
+import Loader from '../../components/Loader'
 
 interface EstabelecimentoProps {
   CNPJ: number
+  CNES: string
+  RAZAO_SOCIAl: string
+  NOME_FANTASIA: string
+  EMAIL_REPRESENTANTE_DEMANDA: string
+  municipio: {
+    UF?: string
+  }
 }
 
 export default function Home () {
   const [searchTerm, setSearchTerm] = useState('')
   const [estabelecimentos, setEstabelecimentos] = useState([])
   const [modalIsVisible, setModalIsVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [hasError, setHasError] = useState(true)
 
   function handleModal () {
     setModalIsVisible(!modalIsVisible)
@@ -22,59 +35,98 @@ export default function Home () {
     setSearchTerm(event.target.value)
   }
 
-  const filteredContactsByCNPJ = useMemo(() => estabelecimentos.filter((estabelecimento: EstabelecimentoProps) => (String(estabelecimento.CNPJ).includes(searchTerm))), [estabelecimentos, searchTerm])
+  function tranformCNPJ (cnpj: number) {
+    const transforedCNPJ = String(cnpj)
+    if (transforedCNPJ.length > 11) {
+      return transforedCNPJ.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')
+    }
+    return transforedCNPJ.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+  }
+
+  const filteredContactsByCNPJ = useMemo(() => estabelecimentos.filter((estabelecimento: EstabelecimentoProps) => (
+    String(estabelecimento.CNPJ)
+      .startsWith(searchTerm.replace(/[^a-zA-Z0-9 ]/g, '')))
+  ), [estabelecimentos, searchTerm])
 
   useEffect(() => {
     async function getData () {
       try {
-        const response = await axios.get('http://localhost:5000/estabelecimentos/')
+        setIsLoading(true)
+        const response = await axios.get(`${process.env.REACT_APP_BASE_BACK_URL}/estabelecimentos`)
+
         setEstabelecimentos(response.data)
-        console.log(estabelecimentos)
+        setHasError(false)
+        setIsLoading(false)
       } catch (error) {
-        console.log(error)
+        setIsLoading(false)
+        setHasError(true)
       }
     }
 
     getData()
   }, [])
-
+  const hasEstabelecimentos = filteredContactsByCNPJ.length > 0
+  const isListEmpty = !hasError && (!isLoading && !hasEstabelecimentos)
   return (
     <>
-    <InputSearchContainer>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={handleSearchTerm}
-        placeholder="Pesquise pelo CNPJ"
-        />
-    </InputSearchContainer>
-    <button onClick={handleModal}>+ estabelecimento</button>
-    <Container>
-      <table>
-        <thead>
-          <th>CNPJ</th>
-          <th>CNES</th>
-          <th>RAZAO SOCIAL</th>
-          <th>Representante</th>
-          <th></th>
-        </thead>
-        <tbody>
-          {filteredContactsByCNPJ.map((estabelecimento: EstabelecimentoProps) => (
-            <tr key={estabelecimento.CNPJ}>
-              <td>{estabelecimento.CNPJ}</td>
-              <td>32154</td>
-              <td>Loja Teste</td>
-              <td>Rep</td>
-              <td><Link to="/">Ir</Link></td>
-          </tr>
-          ))}
+      <Container>
+        <Loader isLoading={isLoading} />
+        {hasError && (<h1>Erro ao carregar a pagina</h1>)}
 
-        </tbody>
-      </table>
-    </Container>
-    <Modal visible={modalIsVisible} onCancel={handleModal}>
-      <CreateEstabelecimento />
-    </Modal>
+        {hasEstabelecimentos && (
+          <>
+            {isListEmpty && (<h1>Nenhum Cnpj encontrado</h1>)}
+            <InputSearchContainer>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearchTerm}
+                placeholder="Pesquise pelo CNPJ"
+              />
+
+            </InputSearchContainer>
+            <table>
+              <thead>
+                <tr>
+                  <th>CNPJ</th>
+                  <th>RAZAO_SOCIAl</th>
+                  <th>UF</th>
+                  <th>Representante</th>
+                  <th>Acessar</th>
+                </tr>
+
+              </thead>
+              <tbody>
+
+                {filteredContactsByCNPJ.slice(0, 15)?.map((estabelecimento: EstabelecimentoProps, index) => (
+                  <tr key={index} >
+                    <td>{tranformCNPJ(estabelecimento.CNPJ)}</td>
+                    <td>{estabelecimento.RAZAO_SOCIAl}</td>
+                    <td>
+                      {!estabelecimento.municipio
+                        ? '@'
+                        : estabelecimento.municipio.UF
+                      }
+                    </td>
+                    <td>{estabelecimento.EMAIL_REPRESENTANTE_DEMANDA}</td>
+                    <td className='action-field'>
+                      <Link
+                        to={`/estabelecimento/${estabelecimento.CNPJ}`}>
+                        <img src={enterIcon} alt="Icone de Entrar" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+
+              </tbody>
+            </table>
+          </>
+        )}
+      </Container>
+
+      <Modal visible={modalIsVisible} onCancel={handleModal}>
+        <CreateEstabelecimento />
+      </Modal>
     </>
   )
 }

@@ -1,7 +1,6 @@
-import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
 import { ReactNode } from 'react'
 import { Overlay, Container, Footer } from './styles'
+import ReactPortal from '../ReactPortal'
 
 interface ModalProps {
   children: ReactNode
@@ -9,15 +8,14 @@ interface ModalProps {
   onCancel: () => void
 }
 
-const modalRoot = document.getElementById('modal-root') as HTMLElement
-
 export default function Modal ({ children, visible, onCancel }: ModalProps) {
   if (!visible) {
     return null
   }
 
-  return ReactDOM.createPortal(
-    <Overlay>
+  return (
+    <ReactPortal containerId={ 'modal-root'}>
+      <Overlay>
       <Container >
         {children}
         <Footer>
@@ -30,15 +28,6 @@ export default function Modal ({ children, visible, onCancel }: ModalProps) {
         </Footer>
       </Container>
     </Overlay>,
-
-    modalRoot
+    </ReactPortal>
   )
-}
-
-Modal.propTypes = {
-  danger: PropTypes.bool
-}
-
-Modal.defaultProps = {
-  danger: false
 }
