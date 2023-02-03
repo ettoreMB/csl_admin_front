@@ -42,7 +42,7 @@ export default function Home () {
     return transforedCNPJ.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
   }
 
-  const filteredContactsByCNPJ = useMemo(() => estabelecimentos.filter((estabelecimento: EstabelecimentoProps) => (
+  const filteredContactsByCNPJ = useMemo(() => estabelecimentos?.filter((estabelecimento: EstabelecimentoProps) => (
     String(estabelecimento.CNPJ)
       .startsWith(searchTerm.replace(/[^a-zA-Z0-9 ]/g, '')))
   ), [estabelecimentos, searchTerm])
