@@ -3,6 +3,7 @@ import { useState, ChangeEvent } from 'react'
 import EstabelecimentoForm from '../../components/EstabelecimentoForm'
 import { Container } from './styles'
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from '@azure/msal-react'
+import PessoaFisicaForm from '../../components/PessoaFisicaForm'
 // import FormGroup from '../../components/FormGroup'
 
 export default function CreateEstabelecimento () {
@@ -27,7 +28,7 @@ export default function CreateEstabelecimento () {
       </div>
       {isCNPJ === 'juridica'
         ? (<EstabelecimentoForm/>)
-        : (<h1>Em desenvolvimento</h1>)}
+        : (<PessoaFisicaForm />)}
 
       </Container>
     </AuthenticatedTemplate>

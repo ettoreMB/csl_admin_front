@@ -56,15 +56,18 @@ export default function Estabelecimento () {
     async function loadEstabelecimento () {
       try {
         setIsloading(true)
-        const response = await axios.get(`${process.env.REACT_APP_BASE_BACK_URL}/estabelecimentos/${cnpj}`)
+        const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos/${cnpj}`)
+
         setEstabelecimento(response.data)
+
         setIsloading(false)
       } catch (error) {
-
+        console.log(error)
       }
     }
     loadEstabelecimento()
   }, [cnpj])
+  console.log(estabelecimento)
   return (
     <>
       <Loader isLoading={isLoading} />
@@ -75,7 +78,7 @@ export default function Estabelecimento () {
           </Link>
         <Label
           title={'CNPJ'}
-          value={estabelecimento.CNPJ}
+          value={estabelecimento?.CNPJ}
         />
         <Label
           title={'CNES'}
@@ -91,11 +94,11 @@ export default function Estabelecimento () {
         />
         <Label
           title={'LOGRADOURO'}
-          value={estabelecimento.LOGRADOURO}
+          value={estabelecimento.LOGRADOURO ?? 'Não Informado'}
         />
         <Label
           title={'NUMERO'}
-          value={estabelecimento.NUMERO}
+          value={estabelecimento.NUMERO ?? 'Não Informado' ?? 'Não Informado'}
         />
         {estabelecimento.municipio && (
           <Label

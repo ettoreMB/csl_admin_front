@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import axios from 'axios'
-import { useEffect, ChangeEvent, useMemo, useState } from 'react'
+import { useEffect, ChangeEvent, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Modal from '../../components/Modal'
 import CreateEstabelecimento from '../NewEstabelecimento'
 import { Container, InputSearchContainer } from './styles'
 import enterIcon from '../../assets/icons/enter.svg'
 import Loader from '../../components/Loader'
+import UseDebounce from '../../hooks/useDebounceSearch'
 
 interface EstabelecimentoProps {
   CNPJ: number
@@ -26,6 +27,7 @@ export default function Home () {
   const [isLoading, setIsLoading] = useState(false)
   const [hasError, setHasError] = useState(true)
 
+  const { debaunceValue } = UseDebounce(searchTerm, 400)
   function handleModal () {
     setModalIsVisible(!modalIsVisible)
   }
@@ -33,93 +35,88 @@ export default function Home () {
   function handleSearchTerm (event: ChangeEvent<HTMLInputElement>) {
     setSearchTerm(event.target.value)
   }
+  async function loadData () {
+    try {
+      // setIsLoading(true)
+      const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos/?cnpj=`)
 
-  function tranformCNPJ (cnpj: number) {
-    const transforedCNPJ = String(cnpj)
-    if (transforedCNPJ.length > 11) {
-      return transforedCNPJ.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')
+      setEstabelecimentos(response.data)
+      setHasError(false)
+      setIsLoading(false)
+    } catch (error) {
+      setHasError(true)
+      setIsLoading(false)
     }
-    return transforedCNPJ.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
   }
-
+  async function getData (value: string) {
+    const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos?cnpj=${value}`)
+    // setIsLoading(true)
+    setEstabelecimentos(response.data)
+    setHasError(false)
+    setIsLoading(false)
+  }
   useEffect(() => {
-    async function getData () {
-      try {
-        setIsLoading(true)
-        const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos`)
-
-        setEstabelecimentos(response.data)
-        setHasError(false)
-        setIsLoading(false)
-      } catch (error) {
-        setHasError(true)
-        setIsLoading(false)
-      }
+    if (debaunceValue) {
+      getData(debaunceValue)
     }
+    if (debaunceValue === '') {
+      loadData()
+    }
+    return () => {}
+  }, [debaunceValue])
 
-    getData()
-  }, [])
-  const filteredContactsByCNPJ = useMemo(() => estabelecimentos.filter((estabelecimento: EstabelecimentoProps) => (
-    String(estabelecimento.CNPJ)
-      .startsWith(searchTerm.replace(/[^a-zA-Z0-9 ]/g, '')))
-  ), [estabelecimentos, searchTerm])
-  const hasEstabelecimentos = filteredContactsByCNPJ.length > 0
+  const hasEstabelecimentos = !isLoading && estabelecimentos.length >= 1
   const isListEmpty = !hasError && (!isLoading && !hasEstabelecimentos)
+
   return (
     <>
-        <Loader isLoading={isLoading} />
-        {hasError && (<h1>Erro ao carregar a pagina</h1>)}
-         <Container>
+      <Loader isLoading={isLoading} />
+      <InputSearchContainer>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchTerm}
+            placeholder="Pesquise pelo CNPJ"
+          />
+        </InputSearchContainer>
 
-        {hasEstabelecimentos && (
-          <>
-            <InputSearchContainer>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={handleSearchTerm}
-                placeholder="Pesquise pelo CNPJ"
-                />
+      {hasError && (<h1>Erro ao carregar a pagina</h1>)}
+      {isListEmpty && <h1>Estabelecimento não encontrado </h1>}
 
-            </InputSearchContainer>
-                {isListEmpty && (<h1>Nenhum Cnpj encontrado</h1>)}
-            <table>
-              <thead>
-                <tr>
-                  <th>CNPJ</th>
-                  <th>RAZAO_SOCIAl</th>
-                  <th>UF</th>
-                  <th>Representante</th>
-                  <th>Acessar</th>
+      <Container>
+      {hasEstabelecimentos && (
+        <>
+          <table>
+            <thead>
+              <tr>
+                <th>CNPJ</th>
+                <th>RAZAO_SOCIAl</th>
+                <th>UF</th>
+                <th>Representante</th>
+                <th>Acessar</th>
+              </tr>
+            </thead>
+            <tbody>
+              {estabelecimentos.map((estabelecimento: EstabelecimentoProps, index) => (
+                <tr key={index} >
+                  <td>{estabelecimento.CNPJ}</td>
+                  <td>{estabelecimento.RAZAO_SOCIAl}</td>
+                  <td>
+                    {!estabelecimento.municipio ? '@' : estabelecimento.municipio.UF}
+                  </td>
+                  <td>{estabelecimento.EMAIL_REPRESENTANTE_DEMANDA}</td>
+                  <td className='action-field'>
+                    <Link
+                      to={`/estabelecimento/${estabelecimento.CNPJ}`}>
+                      <img src={enterIcon} alt="Icone de Entrar" />
+                    </Link>
+                  </td>
                 </tr>
-
-              </thead>
-              <tbody>
-
-                {filteredContactsByCNPJ.slice(0, 15)?.map((estabelecimento: EstabelecimentoProps, index) => (
-                  <tr key={index} >
-                    <td>{tranformCNPJ(estabelecimento.CNPJ)}</td>
-                    <td>{estabelecimento.RAZAO_SOCIAl}</td>
-                    <td>
-                      {!estabelecimento.municipio
-                        ? '@'
-                        : estabelecimento.municipio.UF
-                      }
-                    </td>
-                    <td>{estabelecimento.EMAIL_REPRESENTANTE_DEMANDA}</td>
-                    <td className='action-field'>
-                      <Link
-                        to={`/estabelecimento/${estabelecimento.CNPJ}`}>
-                        <img src={enterIcon} alt="Icone de Entrar" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-
-              </tbody>
-            </table>
-          </>
-        )}
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
       </Container>
 
       <Modal visible={modalIsVisible} onCancel={handleModal}>

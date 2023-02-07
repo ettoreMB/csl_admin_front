@@ -14,4 +14,15 @@ margin-top: 16px ;
     display: flex;
     flex-direction: column;
   }
+
+  .uf {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+
+    span {
+      font-weight: bold;
+    }
+  }
 `

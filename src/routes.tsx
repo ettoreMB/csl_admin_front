@@ -1,8 +1,10 @@
 import { Route, Routes } from 'react-router-dom'
 import Estabelecimento from './pages/Estabelecimento'
 import CreateEstabelecimento from './pages/NewEstabelecimento'
-import Home from './pages/Home/Index'
+
 import Login from './pages/Login'
+import Home from './pages/Home/Index'
+// import Home2 from './pages/Home2'
 
 export default function Router () {
   return (
