@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-import axios from 'axios'
-import { useEffect, ChangeEvent, useState } from 'react'
+
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Modal from '../../components/Modal'
 import CreateEstabelecimento from '../NewEstabelecimento'
 import { Container, InputSearchContainer } from './styles'
 import enterIcon from '../../assets/icons/enter.svg'
 import Loader from '../../components/Loader'
-import UseDebounce from '../../hooks/useDebounceSearch'
+import UseHome from './useHome'
 
 interface EstabelecimentoProps {
   CNPJ: number
@@ -21,40 +20,21 @@ interface EstabelecimentoProps {
 }
 
 export default function Home () {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [estabelecimentos, setEstabelecimentos] = useState([])
-  const [modalIsVisible, setModalIsVisible] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasError, setHasError] = useState(true)
+  const {
+    estabelecimentos,
+    searchTerm,
+    debaunceValue,
+    modalIsVisible,
+    isLoading,
+    hasError,
+    getData,
+    loadData,
+    handleSearchTerm,
+    handleModal,
+    handleTryAgain
 
-  const { debaunceValue } = UseDebounce(searchTerm, 400)
-  function handleModal () {
-    setModalIsVisible(!modalIsVisible)
-  }
+  } = UseHome()
 
-  function handleSearchTerm (event: ChangeEvent<HTMLInputElement>) {
-    setSearchTerm(event.target.value)
-  }
-  async function loadData () {
-    try {
-      // setIsLoading(true)
-      const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos/?cnpj=`)
-
-      setEstabelecimentos(response.data)
-      setHasError(false)
-      setIsLoading(false)
-    } catch (error) {
-      setHasError(true)
-      setIsLoading(false)
-    }
-  }
-  async function getData (value: string) {
-    const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos?cnpj=${value}`)
-    // setIsLoading(true)
-    setEstabelecimentos(response.data)
-    setHasError(false)
-    setIsLoading(false)
-  }
   useEffect(() => {
     if (debaunceValue) {
       getData(debaunceValue)
@@ -63,7 +43,7 @@ export default function Home () {
       loadData()
     }
     return () => {}
-  }, [debaunceValue])
+  }, [debaunceValue, loadData])
 
   const hasEstabelecimentos = !isLoading && estabelecimentos.length >= 1
   const isListEmpty = !hasError && (!isLoading && !hasEstabelecimentos)
@@ -80,8 +60,8 @@ export default function Home () {
           />
         </InputSearchContainer>
 
-      {hasError && (<h1>Erro ao carregar a pagina</h1>)}
-      {isListEmpty && <h1>Estabelecimento não encontrado </h1>}
+      {hasError && (<h1>Erro ao carregar a pagina <button onClick={handleTryAgain}>Recarregar pagina</button></h1>)}
+      {isListEmpty && <h1>Estabelecimento não encontrado  </h1>}
 
       <Container>
       {hasEstabelecimentos && (

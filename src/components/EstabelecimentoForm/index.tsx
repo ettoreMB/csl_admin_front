@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import axios, { isAxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useState, ChangeEvent } from 'react'
 
 import toast from '../../services/utils/toast'
@@ -11,20 +11,23 @@ import { Form } from './styles'
 
 export default function EstabelecimentoForm () {
   const [cnpj, setCnpj] = useState('')
+  const [submiting, setIsSubmiting] = useState(false)
 
   async function handleSubmit (event: any): Promise<void> {
     try {
       event.preventDefault()
-      await axios.post(`${process.env.REACT_APP_BASE_BACK_URL}/search`, {
+      setIsSubmiting(true)
+      await axios.post(`${process.env.REACT_APP_BACK}/estabelecimentos/cnpj`, {
         cnpj
       })
 
       toast({ text: 'Estabelecimento Incluido com sucesso', type: 'success' })
+      setIsSubmiting(false)
       setCnpj('')
-    } catch (error) {
-      if (isAxiosError(error)) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        toast({ text: `${error?.response?.data?.message}`, type: 'danger' })
+    } catch (err) {
+      setIsSubmiting(false)
+      if (err instanceof AxiosError && err?.response?.data) {
+        toast({ text: `${err?.response?.data?.message}`, type: 'danger' })
       } else {
         toast({ text: 'Erro ao incluir CNPJ ', type: 'danger' })
       }
@@ -48,7 +51,7 @@ export default function EstabelecimentoForm () {
         onChange={handleCnpj}
         />
       </FormGroup>
-      <Button type='submit'>Cadastrar</Button>
+      <Button type='submit' isLoading={submiting}>Cadastrar</Button>
       </div>
 
     </Form>

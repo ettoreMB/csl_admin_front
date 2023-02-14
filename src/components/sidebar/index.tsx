@@ -22,6 +22,7 @@ export default function SideBar ({ visible, closeSideBar }: SideBarProps) {
       <nav>
         <Link to="/">Home</Link>
         <Link to="/criar">Cadastrar Estabelecimento</Link>
+        <Link to="/demanda">Demanda</Link>
       </nav>
     </Container>
   )

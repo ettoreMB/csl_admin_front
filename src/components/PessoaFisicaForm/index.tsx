@@ -6,14 +6,15 @@ import FormGroup from '../FormGroup'
 import Input from '../Input'
 import { Form } from './styles'
 import toast from '../../services/utils/toast'
-import axios, { isAxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 
 export default function PessoaFisicaForm () {
   const [cpf, setCpf] = useState('')
-  const [name, setName] = useState('')
+  const [nome, setNome] = useState('')
   const [ufList, setUfList] = useState([])
   const [municipiosList, setMunicipiosList] = useState([])
   const [selectedUF, setSelectedUF] = useState('')
+  const [submiting, setIsSubmiting] = useState(false)
 
   useEffect(() => {
     async function loadUF () {
@@ -30,20 +31,19 @@ export default function PessoaFisicaForm () {
   async function handleSubmit (event: any): Promise<void> {
     try {
       event.preventDefault()
-      // await axios.post('http://localhost:5000/estabelecimentos/cpf', {
-      //   cpf: cpf !== '' ? cpf : '999999999',
-      //   name
-      // })
-      const fisica = {
-        cpf: cpf !== '' ? cpf : '999999999',
-        name
-      }
-      console.log(fisica)
-      toast({ text: 'Estabelecimento Incluido com sucesso', type: 'success' })
+      setIsSubmiting(true)
+      await axios.post('http://localhost:5000/estabelecimentos/cpf', {
+        cpf,
+        nome
+      })
+
+      toast({ text: 'Pessoa Incluido com sucesso', type: 'success' })
       setCpf('')
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast({ text: `${error?.response?.data?.message}`, type: 'danger' })
+      setIsSubmiting(false)
+    } catch (err) {
+      setIsSubmiting(false)
+      if (err instanceof AxiosError && err?.response?.data) {
+        toast({ text: `${err?.response?.data?.message}`, type: 'danger' })
       } else {
         toast({ text: 'Erro ao incluir CNPJ ', type: 'danger' })
       }
@@ -58,7 +58,7 @@ export default function PessoaFisicaForm () {
     setCpf(event.target.value)
   }
   function handleName (event: ChangeEvent<HTMLInputElement>) {
-    setName(event.target.value)
+    setNome(event.target.value)
   }
   function handleUf (event: ChangeEvent<HTMLSelectElement>) {
     setSelectedUF(event.target.value)
@@ -109,7 +109,7 @@ export default function PessoaFisicaForm () {
         </div>
 
       </div>
-      <Button type='submit'>Cadastrar</Button>
+      <Button type='submit' isLoading={submiting}>Cadastrar</Button>
     </Form>
   )
 }
