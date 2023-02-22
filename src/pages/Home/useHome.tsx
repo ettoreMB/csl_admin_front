@@ -21,7 +21,7 @@ export default function UseHome () {
 
   const loadData = useCallback(async () => {
     try {
-      // setIsLoading(true)
+      setIsLoading(true)
       const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos`)
 
       setEstabelecimentos(response.data)
@@ -38,7 +38,7 @@ export default function UseHome () {
   }
   async function getData (value: string) {
     const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos?search=${value}`)
-    // setIsLoading(true)
+    setIsLoading(true)
     setEstabelecimentos(response.data)
     setHasError(false)
     setIsLoading(false)
