@@ -2,12 +2,12 @@
 import axios from 'axios'
 import { useState, ChangeEvent, useEffect } from 'react'
 import Button from '../../components/Button'
+import Input from '../../components/Input'
 import Select from '../../components/Select'
 
 import { ListContainer } from './styles'
 
 export default function TransferenciaSetorizacao () {
-  console.log('renderizei')
   const [estabelecimento, setEstabelecimento] = useState({
     CNPJ: '',
     RAZAO_SOCIAL: ''
@@ -20,10 +20,6 @@ export default function TransferenciaSetorizacao () {
   async function handleSearchEstabelecimento () {
     try {
       const result = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos/${searchParam}`)
-      setEstabelecimento({
-        CNPJ: '',
-        RAZAO_SOCIAL: ''
-      })
       setEstabelecimento(result.data)
       setHasError(false)
     } catch (error) {
@@ -41,10 +37,14 @@ export default function TransferenciaSetorizacao () {
 
   function handleAddEstabelecimentoList () {
     const estabelecimentoAlredyIncluded = estabelecimentosList.find((est: any) => est.CNPJ === estabelecimento.CNPJ)
-    console.log('aDD')
     if (estabelecimentoAlredyIncluded) {
       return
     }
+    setSerachParam('')
+    setEstabelecimento({
+      CNPJ: '',
+      RAZAO_SOCIAL: ''
+    })
     setEstabelecimentosList((prev: any) => [...prev, estabelecimento])
   }
 
@@ -54,25 +54,40 @@ export default function TransferenciaSetorizacao () {
     ))
   }
   function handleInputSearchEstabelecimento (event: ChangeEvent<HTMLInputElement>) {
-    console.log('APERTEI')
     setSerachParam(event.target.value)
   }
 
   function handleSelectEmail (event: ChangeEvent<HTMLSelectElement>) {
     setSelectedEmail(event.target.value)
   }
+
+  async function handleSubmit (event: any) {
+    try {
+      event.preventDefault()
+      const estabelecimentoCnpj = estabelecimentosList.map((est: any) => {
+        return est.CNPJ
+      })
+
+      await axios.patch(`${process.env.REACT_APP_BACK}/setorizacao/transferir`, {
+        emailRep: selectedEmail,
+        estabelecimentos: estabelecimentoCnpj
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
   return (
     <>
-      <label htmlFor="">Procurar cnpj </label>
-      <input type="text" value={searchParam} onChange={handleInputSearchEstabelecimento} />
-      <button onClick={handleSearchEstabelecimento}>Procurar</button>
+      <label htmlFor="">Procurar cnpj</label>
+      <Input type="text" value={searchParam} onChange={handleInputSearchEstabelecimento} />
+      <Button type='button' onClick={handleSearchEstabelecimento}>Procurar</Button>
 
       {(estabelecimento && !hasError) && (
         <>
 
           <h2>{estabelecimento?.CNPJ}</h2>
           <h2>{estabelecimento.RAZAO_SOCIAL}</h2>
-          <button onClick={handleAddEstabelecimentoList}>adicionar</button>
+          <Button type='button' onClick={handleAddEstabelecimentoList}>adicionar</Button >
           {hasError && (<h2>Erro</h2>)}
         </>
 
@@ -84,7 +99,7 @@ export default function TransferenciaSetorizacao () {
             <span >{est.CNPJ}</span>
             <span >{est.NOME_FANTASIA}</span>
             <span >{est.EMAIL_REPRESENTANTE_DEMANDA}</span>
-            <button onClick={() => { handleRemoveEstabelecimentofromList(est.CNPJ) }}>Remover</button>
+            <Button type='button' onClick={() => { handleRemoveEstabelecimentofromList(est.CNPJ) }}>Remover</Button>
           </div>
 
         ))}
@@ -93,12 +108,12 @@ export default function TransferenciaSetorizacao () {
         <>
           <span>Transferir para :</span>
           <Select onChange={handleSelectEmail} value={selectedEmail}>
-        <option>Email</option>
-        {emails.map((email: any) =>
-          (<option key={email.EMAIL_REPRESENTANTE_DEMANDA} value={email.EMAIL_REPRESENTANTE_DEMANDA}>{email.EMAIL_REPRESENTANTE_DEMANDA}</option>)
-        )}
-      </Select>
-      <Button type='submit'> Transferir</Button>
+            <option>Email</option>
+            {emails.map((email: any) =>
+              (<option key={email.EMAIL_REPRESENTANTE_DEMANDA} value={email.EMAIL_REPRESENTANTE_DEMANDA}>{email.EMAIL_REPRESENTANTE_DEMANDA}</option>)
+            )}
+          </Select>
+          <button type='button' onClick={handleSubmit}> Transferir</button>
         </>
       )}
     </>
