@@ -26,6 +26,7 @@
         "@typescript-eslint/strict-boolean-expressions": "warn",
         "@typescript-eslint/no-floating-promises": 0,
         "class-methods-use-this": "off",
+        "@typescript-eslint/restrict-template-expressions": 0,
       "react-hooks/rules-of-hooks":"error",
       "react-hooks/exhaustive-deps":"warn"
     }

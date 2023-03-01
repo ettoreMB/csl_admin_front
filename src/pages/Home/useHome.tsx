@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import axios from 'axios'
-import { ChangeEvent, useState, useCallback } from 'react'
+import { ChangeEvent, useState, useCallback, useEffect } from 'react'
 import UseDebounce from '../../hooks/useDebounceSearch'
 
 export default function UseHome () {
@@ -36,14 +36,24 @@ export default function UseHome () {
   function handleTryAgain () {
     loadData()
   }
-  async function getData (value: string) {
+
+  const getData = useCallback(async (value: string) => {
     const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos?search=${value}`)
     setIsLoading(true)
     setEstabelecimentos(response.data)
     setHasError(false)
     setIsLoading(false)
-  }
+  }, [])
 
+  useEffect(() => {
+    if (debaunceValue) {
+      getData(debaunceValue)
+    }
+    if (debaunceValue === '') {
+      loadData()
+    }
+    return () => {}
+  }, [debaunceValue, loadData, getData])
   return {
     searchTerm,
     estabelecimentos,

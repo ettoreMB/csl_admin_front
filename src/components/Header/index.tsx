@@ -12,6 +12,7 @@ export function Header () {
   async function handleLogin () {
     await instance.loginPopup()
   }
+
   function handleOpenSideBar () {
     if (isNavBarVisible) {
       setIsNavBarVisible(false)

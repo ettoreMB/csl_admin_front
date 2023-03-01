@@ -29,14 +29,12 @@ table {
 
       }
       td:nth-child(1) {
-        width: 15%;
+        width: 14%;
       }
       td:nth-child(3) {
-        width: 5%;
+        width: 24%;
       }
-      td:nth-child(4) {
-        width: 28%;
-      }
+
       td {
       padding: 4px 8px;
       word-break: break-word;
@@ -51,14 +49,14 @@ table {
 
 export const InputSearchContainer = styled.div`
   width: 100%;
-  margin-bottom: 16px;
+  margin: 16px 0;
   display: flex;
   flex-direction: row;
   input {
     width: 100%;
     background: #fff;
     border: none;
-    border-radius: 25px;
+    border-radius: 8px;
     height: 50px;
     padding: 0 1rem;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.07);
@@ -67,4 +65,13 @@ export const InputSearchContainer = styled.div`
         color: ${({ theme }) => theme.colors.gray['200']};
       }
    }
+`
+
+export const LoadPageError = styled.div`
+ display: flex;
+ align-items: center;
+ flex-direction: column;
+ margin: 3rem;
+ font-size: 26px;
+ gap: 16px
 `

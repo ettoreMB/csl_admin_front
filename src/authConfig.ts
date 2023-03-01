@@ -7,8 +7,8 @@ export const msalConfig: Configuration = {
     clientId,
     authority: authorityLink,
     redirectUri: '/',
-    postLogoutRedirectUri: 'https://csl-admin-front.vercel.app/login',
-    navigateToLoginRequestUrl: false // If "true", will navigate back to the original request location before processing the auth code response.
+    postLogoutRedirectUri: 'https://csl-admin-front.vercel.app/',
+    navigateToLoginRequestUrl: true // If "true", will navigate back to the original request location before processing the auth code response.
   },
   cache: {
     cacheLocation: 'sessionStorage', // Configures cache location. "sessionStorage" is more secure, but "localStorage" gives you SSO between tabs.
@@ -48,5 +48,5 @@ export const loginRequest: PopupRequest = {
  */
 export const silentRequest = {
   scopes: ['openid', 'profile'],
-  loginHint: 'example@domain.net'
+  loginHint: 'example@wfbconsultoria.com'
 }

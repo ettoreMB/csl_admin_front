@@ -1,12 +1,12 @@
 
-import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Modal from '../../components/Modal'
 import CreateEstabelecimento from '../NewEstabelecimento'
-import { Container, InputSearchContainer } from './styles'
+import { Container, InputSearchContainer, LoadPageError } from './styles'
 import enterIcon from '../../assets/icons/enter.svg'
 import Loader from '../../components/Loader'
 import UseHome from './useHome'
+import Button from '../../components/Button'
 
 interface EstabelecimentoProps {
   CNPJ: number
@@ -14,7 +14,7 @@ interface EstabelecimentoProps {
   RAZAO_SOCIAl: string
   NOME_FANTASIA: string
   EMAIL_REPRESENTANTE_DEMANDA: string
-  municipio: {
+  TBL_MUNICIPIOS: {
     UF?: string
   }
 }
@@ -23,27 +23,13 @@ export default function Home () {
   const {
     estabelecimentos,
     searchTerm,
-    debaunceValue,
     modalIsVisible,
     isLoading,
     hasError,
-    getData,
-    loadData,
     handleSearchTerm,
     handleModal,
     handleTryAgain
-
   } = UseHome()
-
-  useEffect(() => {
-    if (debaunceValue) {
-      getData(debaunceValue)
-    }
-    if (debaunceValue === '') {
-      loadData()
-    }
-    return () => {}
-  }, [debaunceValue, loadData])
 
   const hasEstabelecimentos = !isLoading && estabelecimentos.length >= 1
   const isListEmpty = !hasError && (!isLoading && !hasEstabelecimentos)
@@ -56,11 +42,16 @@ export default function Home () {
             type="text"
             value={searchTerm}
             onChange={handleSearchTerm}
-            placeholder="Pesquise pelo CNPJ"
+            placeholder="Pesquise pelo CNPJ ou nome fantasia"
           />
         </InputSearchContainer>
 
-      {hasError && (<h1>Erro ao carregar a pagina <button onClick={handleTryAgain}>Recarregar pagina</button></h1>)}
+      {hasError &&
+      (
+      <LoadPageError>
+        <h1>Erro ao carregar a pagina </h1>
+        <Button type="button" onClick={handleTryAgain}>Recarregar pagina</Button>
+      </LoadPageError>)}
       {isListEmpty && <h1>Estabelecimento não encontrado  </h1>}
 
       <Container>
@@ -70,8 +61,7 @@ export default function Home () {
             <thead>
               <tr>
                 <th>CNPJ</th>
-                <th>RAZAO_SOCIAl</th>
-                <th>UF</th>
+                <th>NOME FANTASIA</th>
                 <th>Representante</th>
                 <th>Acessar</th>
               </tr>
@@ -80,10 +70,7 @@ export default function Home () {
               {estabelecimentos.map((estabelecimento: EstabelecimentoProps, index) => (
                 <tr key={index} >
                   <td>{estabelecimento.CNPJ}</td>
-                  <td>{estabelecimento.RAZAO_SOCIAl}</td>
-                  <td>
-                    {!estabelecimento.municipio ? '@' : estabelecimento.municipio.UF}
-                  </td>
+                  <td>{estabelecimento.NOME_FANTASIA}</td>
                   <td>{estabelecimento.EMAIL_REPRESENTANTE_DEMANDA}</td>
                   <td className='action-field'>
                     <Link

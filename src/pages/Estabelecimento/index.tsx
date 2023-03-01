@@ -11,7 +11,7 @@ import arrow from '../../assets/icons/arrow.svg'
 interface EstabelecimentoProps {
   CNPJ: number
   CNES: string
-  RAZAO_SOCIAl: string
+  RAZAO_SOCIAL: string
   NOME_FANTASIA: string
   LOGRADOURO: string
   NUMERO: string
@@ -20,11 +20,17 @@ interface EstabelecimentoProps {
   CEP: string
   EMAIL_REPRESENTANTE_DEMANDA: string
   EMAIL_REPRESENTANTE_VENDA: string
-  municipio: {
-    COD_MUNICIPIO: number
+  TBL_MUNICIPIOS: {
     CIDADE: string
-    CIDADE_UF: string
+    ESTADO: string
     UF: string
+    COD_MUNICIPIO: number
+  }
+  TBL_FV_REPRESENTANTES_DEMANDA: {
+    EMAIL_REPRESENTANTE_DEMANDA: string
+  }
+  TBL_ESTABELECIMENTOS_GRUPOS: {
+    GRUPO_ESTABELECIMENTO: string
   }
 }
 
@@ -33,7 +39,7 @@ export default function Estabelecimento () {
     CNPJ: 0,
     CNES: '',
     NOME_FANTASIA: '',
-    RAZAO_SOCIAl: '',
+    RAZAO_SOCIAL: '',
     LOGRADOURO: '',
     NUMERO: '',
     COMPLEMENTO: '',
@@ -41,11 +47,17 @@ export default function Estabelecimento () {
     EMAIL_REPRESENTANTE_VENDA: '',
     CEP: '',
     EMAIL_REPRESENTANTE_DEMANDA: '',
-    municipio: {
-      COD_MUNICIPIO: 0,
+    TBL_MUNICIPIOS: {
       CIDADE: '',
-      CIDADE_UF: '',
-      UF: ''
+      ESTADO: '',
+      UF: '',
+      COD_MUNICIPIO: 0
+    },
+    TBL_FV_REPRESENTANTES_DEMANDA: {
+      EMAIL_REPRESENTANTE_DEMANDA: ''
+    },
+    TBL_ESTABELECIMENTOS_GRUPOS: {
+      GRUPO_ESTABELECIMENTO: ''
     }
   })
   const [isLoading, setIsloading] = useState(false)
@@ -86,7 +98,7 @@ export default function Estabelecimento () {
         />
         <Label
           title={'RAZÃO SOCIAL'}
-          value={estabelecimento.RAZAO_SOCIAl}
+          value={estabelecimento.RAZAO_SOCIAL}
         />
         <Label
           title={'NOME FANTASIA'}
@@ -100,10 +112,10 @@ export default function Estabelecimento () {
           title={'NUMERO'}
           value={estabelecimento.NUMERO ?? 'Não Informado' ?? 'Não Informado'}
         />
-        {estabelecimento.municipio && (
+        {estabelecimento.TBL_MUNICIPIOS && (
           <Label
           title={'UF'}
-          value={estabelecimento.municipio.UF}
+          value={estabelecimento.TBL_MUNICIPIOS.UF}
         />
         )}
 
