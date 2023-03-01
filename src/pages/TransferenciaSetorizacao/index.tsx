@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import axios from 'axios'
 import { useState, ChangeEvent, useEffect } from 'react'
 import Button from '../../components/Button'
 import Input from '../../components/Input'
 import Select from '../../components/Select'
-
-import { ListContainer } from './styles'
+import CloseIcon from '../../assets/icons/close.svg'
+import { Container, ListContainer, SearchContainer } from './styles'
 
 export default function TransferenciaSetorizacao () {
   const [estabelecimento, setEstabelecimento] = useState({
@@ -78,35 +79,49 @@ export default function TransferenciaSetorizacao () {
   }
   return (
     <>
-      <label htmlFor="">Procurar cnpj</label>
-      <Input type="text" value={searchParam} onChange={handleInputSearchEstabelecimento} />
-      <Button type='button' onClick={handleSearchEstabelecimento}>Procurar</Button>
+        <label htmlFor="">Procure o estabelecimento</label>
+      <SearchContainer>
+        <Input type="text" value={searchParam} onChange={handleInputSearchEstabelecimento} />
+        <Button type='button' onClick={handleSearchEstabelecimento}>Procurar</Button>
+      </SearchContainer>
 
-      {(estabelecimento && !hasError) && (
-        <>
+      <Container>
+        {(estabelecimento.CNPJ !== '' && !hasError) && (
+          <>
+            <h2>{estabelecimento?.CNPJ}</h2>
+            <h2>{estabelecimento.RAZAO_SOCIAL}</h2>
+            <Button type='button' onClick={handleAddEstabelecimentoList}>adicionar a lista</Button >
+            {hasError && (<h2>Erro</h2>)}
+          </>
+        )}
+      </Container>
 
-          <h2>{estabelecimento?.CNPJ}</h2>
-          <h2>{estabelecimento.RAZAO_SOCIAL}</h2>
-          <Button type='button' onClick={handleAddEstabelecimentoList}>adicionar</Button >
-          {hasError && (<h2>Erro</h2>)}
-        </>
-
-      )}
-
+      <h2>Lista de estabelecimentos para tranferência</h2>
       <ListContainer>
+        <div className='listHeader'>
+          <span>CNPJ</span>
+          <span>Nome</span>
+          <span>Rep</span>
+          <span></span>
+        </div>
+
         {estabelecimentosList?.map((est: any) => (
           <div key={est.CNPJ}>
             <span >{est.CNPJ}</span>
             <span >{est.NOME_FANTASIA}</span>
             <span >{est.EMAIL_REPRESENTANTE_DEMANDA}</span>
-            <Button type='button' onClick={() => { handleRemoveEstabelecimentofromList(est.CNPJ) }}>Remover</Button>
-          </div>
+            <button
 
+              onClick={() => handleRemoveEstabelecimentofromList(est.CNPJ)}
+              >
+                <img src={CloseIcon} alt="botão para fechar" />
+              </button>
+          </div>
         ))}
       </ListContainer>
       {estabelecimentosList.length > 0 && (
-        <>
-          <span>Transferir para :</span>
+        <Container>
+          <span>Escolha o email para tansferência :</span>
           <Select onChange={handleSelectEmail} value={selectedEmail}>
             <option>Email</option>
             {emails.map((email: any) =>
@@ -114,7 +129,7 @@ export default function TransferenciaSetorizacao () {
             )}
           </Select>
           <button type='button' onClick={handleSubmit}> Transferir</button>
-        </>
+        </Container>
       )}
     </>
   )
