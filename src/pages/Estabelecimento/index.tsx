@@ -79,7 +79,7 @@ export default function Estabelecimento () {
     }
     loadEstabelecimento()
   }, [cnpj])
-  console.log(estabelecimento)
+
   return (
     <>
       <Loader isLoading={isLoading} />

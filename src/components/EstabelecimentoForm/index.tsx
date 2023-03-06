@@ -27,7 +27,8 @@ export default function EstabelecimentoForm () {
     } catch (err) {
       setIsSubmiting(false)
       if (err instanceof AxiosError && err?.response?.data) {
-        toast({ text: `${err?.response?.data?.message}`, type: 'danger' })
+        console.log(err?.response.data)
+        toast({ text: `${err?.response.data}`, type: 'danger' })
       } else {
         toast({ text: 'Erro ao incluir CNPJ ', type: 'danger' })
       }

@@ -11,6 +11,7 @@ import axios, { AxiosError } from 'axios'
 export default function PessoaFisicaForm () {
   const [cpf, setCpf] = useState('')
   const [nome, setNome] = useState('')
+  const [codMunicipio, setCodMunicipio] = useState('0000000')
   const [ufList, setUfList] = useState([])
   const [municipiosList, setMunicipiosList] = useState([])
   const [selectedUF, setSelectedUF] = useState('')
@@ -19,7 +20,7 @@ export default function PessoaFisicaForm () {
   useEffect(() => {
     async function loadUF () {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACK}/municipios`)
+        const response = await axios.get(`${process.env.REACT_APP_BACK}/municipios/uf`)
         setUfList(response.data)
       } catch (error) {
         console.log(error)
@@ -32,18 +33,21 @@ export default function PessoaFisicaForm () {
     try {
       event.preventDefault()
       setIsSubmiting(true)
+      console.log(nome, cpf)
       await axios.post('http://localhost:5000/estabelecimentos/cpf', {
         cpf,
-        nome
+        nome,
+        codMunicipio
       })
 
       toast({ text: 'Pessoa Incluido com sucesso', type: 'success' })
       setCpf('')
+      setNome('')
       setIsSubmiting(false)
     } catch (err) {
       setIsSubmiting(false)
       if (err instanceof AxiosError && err?.response?.data) {
-        toast({ text: `${err?.response?.data?.message}`, type: 'danger' })
+        toast({ text: `${err?.response?.data}`, type: 'danger' })
       } else {
         toast({ text: 'Erro ao incluir CNPJ ', type: 'danger' })
       }
@@ -51,7 +55,7 @@ export default function PessoaFisicaForm () {
   }
 
   async function handleMunicipios (uf: string): Promise<any> {
-    const response = await axios.get(`${process.env.REACT_APP_BACK}/municipios/${uf}`)
+    const response = await axios.get(`${process.env.REACT_APP_BACK}/municipios/cities/${uf}`)
     setMunicipiosList(response.data)
   }
   function handleCpf (event: ChangeEvent<HTMLInputElement>) {
@@ -59,6 +63,9 @@ export default function PessoaFisicaForm () {
   }
   function handleName (event: ChangeEvent<HTMLInputElement>) {
     setNome(event.target.value)
+  }
+  function handleCodMunicipio (event: ChangeEvent<HTMLSelectElement>) {
+    setCodMunicipio(event.target.value)
   }
   function handleUf (event: ChangeEvent<HTMLSelectElement>) {
     setSelectedUF(event.target.value)
@@ -75,10 +82,10 @@ export default function PessoaFisicaForm () {
       <div>
 
       <FormGroup>
-        <Input placeholder='nome*' onChange={handleName} />
+        <Input placeholder='nome*' onChange={handleName} value={nome} />
       </FormGroup>
       <FormGroup>
-        <Input placeholder='cpf*' onChange={handleCpf}/>
+        <Input placeholder='cpf*' onChange={handleCpf} value={cpf}/>
       </FormGroup>
 
         <div className='uf'>
@@ -98,9 +105,10 @@ export default function PessoaFisicaForm () {
           <div>
           <span>Cidade</span>
           <FormGroup>
-          <select>
+          <select onChange={handleCodMunicipio} value={codMunicipio}>
+            <option value="Nao Informado">Não informado</option>
             {municipiosList.map((municipio: any) => (
-              <option key={municipio.COD_MUNICIPIO} value={municipio.COD_MUNICIPIO}>{municipio.CIDADE}</option>
+              <option key={Math.random()} value={municipio.COD_MUNICIPIO}>{municipio.CIDADE}</option>
             ))}
         </select>
         </FormGroup>
