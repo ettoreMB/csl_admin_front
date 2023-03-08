@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import axios from 'axios'
 import { ChangeEvent, useState, useCallback, useEffect } from 'react'
 import UseDebounce from '../../hooks/useDebounceSearch'
+import EstabelecimentosServices from '../../services/EstabelecimentosServices'
 
 export default function UseHome () {
   const [searchTerm, setSearchTerm] = useState('')
@@ -22,9 +22,8 @@ export default function UseHome () {
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true)
-      const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos`)
-
-      setEstabelecimentos(response.data)
+      const estabeleciemntos = await EstabelecimentosServices.listAll()
+      setEstabelecimentos(estabeleciemntos)
       setHasError(false)
       setIsLoading(false)
     } catch (error) {
@@ -38,7 +37,7 @@ export default function UseHome () {
   }
 
   const getData = useCallback(async (value: string) => {
-    const response = await axios.get(`${process.env.REACT_APP_BACK}/estabelecimentos?search=${value}`)
+    const response = await EstabelecimentosServices.searchEstabelecimento(value)
     setIsLoading(true)
     setEstabelecimentos(response.data)
     setHasError(false)

@@ -12,6 +12,7 @@ import { Header } from '../../components/Header'
 import ToastContainer from '../../components/Toast/ToastContainer'
 import { IPublicClientApplication } from '@azure/msal-browser'
 import Login from '../Login'
+import AuthContainer from '../../components/AuthContainer'
 
 interface AppProps {
   pca: IPublicClientApplication
@@ -26,8 +27,10 @@ export default function App ({ pca }: AppProps) {
           <AuthenticatedTemplate>
             <Header />
             <AppContainer>
-              <ToastContainer />
-              <Routes />
+              <AuthContainer>
+                <ToastContainer />
+                <Routes />
+              </AuthContainer>
             </AppContainer>
           </AuthenticatedTemplate>
           <UnauthenticatedTemplate>

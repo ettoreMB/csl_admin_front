@@ -1,12 +1,11 @@
-
-import { Link } from 'react-router-dom'
 import Modal from '../../components/Modal'
 import CreateEstabelecimento from '../NewEstabelecimento'
-import { Container, InputSearchContainer, LoadPageError } from './styles'
-import enterIcon from '../../assets/icons/enter.svg'
+import { Container, InputSearchContainer } from './styles'
 import Loader from '../../components/Loader'
 import UseHome from './useHome'
-import Button from '../../components/Button'
+import HomeTable from './components/table'
+import TableRow from './components/tableRow'
+import { PageError } from './components/pageError'
 
 interface EstabelecimentoProps {
   CNPJ: number
@@ -38,52 +37,25 @@ export default function Home () {
     <>
       <Loader isLoading={isLoading} />
       <InputSearchContainer>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={handleSearchTerm}
-            placeholder="Pesquise pelo CNPJ ou nome fantasia"
-          />
-        </InputSearchContainer>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={handleSearchTerm}
+          placeholder="Pesquise pelo CNPJ ou nome fantasia"
+        />
+      </InputSearchContainer>
 
-      {hasError &&
-      (
-      <LoadPageError>
-        <h1>Erro ao carregar a pagina </h1>
-        <Button type="button" onClick={handleTryAgain}>Recarregar pagina</Button>
-      </LoadPageError>)}
-      {isListEmpty && <h1>Estabelecimento não encontrado  </h1>}
+      {hasError && (<PageError onHandleTryAgain={handleTryAgain}/>)}
+      {isListEmpty && <h1>Estabelecimento não encontrado </h1>}
 
       <Container>
-      {hasEstabelecimentos && (
-        <>
-          <table>
-            <thead>
-              <tr>
-                <th>CNPJ</th>
-                <th>NOME FANTASIA</th>
-                <th>Representante</th>
-                <th>Acessar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {estabelecimentos.map((estabelecimento: EstabelecimentoProps, index) => (
-                <tr key={index} >
-                  <td>{estabelecimento.CNPJ}</td>
-                  <td>{estabelecimento.NOME_FANTASIA}</td>
-                  <td>{estabelecimento.EMAIL_REPRESENTANTE_DEMANDA}</td>
-                  <td className='action-field'>
-                    <Link
-                      to={`/estabelecimento/${estabelecimento.CNPJ}`}>
-                      <img src={enterIcon} alt="Icone de Entrar" />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
+        {hasEstabelecimentos && (
+          <HomeTable>
+            {estabelecimentos.map((estabelecimento: EstabelecimentoProps) => (
+              <TableRow key={Math.random()} estabelecimento={estabelecimento} />
+            ))}
+          </HomeTable>
+        )}
       </Container>
 
       <Modal visible={modalIsVisible} onCancel={handleModal}>

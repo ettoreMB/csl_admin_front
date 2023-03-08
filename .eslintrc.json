@@ -28,6 +28,7 @@
         "class-methods-use-this": "off",
         "@typescript-eslint/restrict-template-expressions": 0,
       "react-hooks/rules-of-hooks":"error",
-      "react-hooks/exhaustive-deps":"warn"
+      "react-hooks/exhaustive-deps":"warn",
+      "@typescript-eslint/no-misused-promises": 0
     }
 }
